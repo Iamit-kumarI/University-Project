@@ -1,0 +1,485 @@
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniCal - Team & Project Presentation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --bg-dark: #0B0E14;
+            --bg-card: #151922;
+            --primary: #6366F1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border: #1E293B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Slide Container */
+        .slide-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            width: 90%;
+            height: 90%; /* Increased height for team grid */
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.7);
+            padding: 40px;
+            box-sizing: border-box;
+            animation: fadeIn 0.6s ease-in-out;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Layout within Slide */
+        .content-area {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px dashed var(--border);
+            padding-right: 20px;
+            position: relative;
+        }
+
+        .notes-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 10px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: var(--text-muted);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        p { line-height: 1.6; color: #CBD5E1; }
+        ul.bullets li { margin-bottom: 15px; color: var(--text-main); font-size: 1.1rem; }
+
+        /* Navigation Controls */
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            right: 60px;
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        button:hover { transform: translateY(-2px); background: #4F46E5; }
+        button:disabled { background: var(--border); cursor: not-allowed; box-shadow: none; }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: absolute;
+            bottom: 0; left: 0; height: 6px;
+            background: var(--primary); width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* TEAM GRID SECTION */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .team-card {
+            background: #1E293B;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid #334155;
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .team-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+
+        .avatar {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .role-badge {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        /* Role Specific Colors */
+        .role-dev { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+        .role-pm { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .role-scrum { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        .member-name { font-weight: 600; font-size: 1.1rem; color: white; margin: 5px 0; }
+        .member-desc { font-size: 0.8rem; color: #94a3b8; }
+
+        /* IMAGE SHOWCASE STYLES */
+        .browser-mockup {
+            width: 100%;
+            max-width: 700px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid #334155;
+            background: #000;
+        }
+        .browser-header { background: #1e293b; padding: 10px 15px; display: flex; gap: 8px; align-items: center; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .red { background: #ef4444; } .yellow { background: #f59e0b; } .green { background: #22c55e; }
+        .mockup-img { width: 100%; height: auto; display: block; }
+
+        /* KANBAN STYLES */
+        .kanban-board { display: flex; gap: 15px; width: 100%; height: 100%; overflow-x: auto; }
+        .kanban-col { background: #0f1219; border-radius: 12px; padding: 15px; min-width: 200px; flex: 1; border: 1px solid var(--border); }
+        .kanban-header { font-weight: 700; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        .k-card { background: var(--bg-card); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.85rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: relative; }
+        .k-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .k-high::before { background: var(--danger); } .k-med::before { background: var(--warning); } .k-low::before { background: var(--success); } .k-done::before { background: var(--primary); }
+        .tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: #1E293B; color: #94A3B8; margin-top: 5px; display: inline-block; }
+
+        .mermaid { width: 100%; display: flex; justify-content: center; }
+    </style>
+</head>
+<body>
+
+<div class="slide-container" id="slideDeck">
+
+    <!-- SLIDE 1: INTRO -->
+    <div class="slide active">
+        <div class="content-area">
+            <div style="text-align: center;">
+                <span style="font-size: 5rem;">📅</span>
+                <h1>UniCal</h1>
+                <p style="font-size: 1.5rem; color: var(--primary);">University Task Management System</p>
+                <p style="margin-top: 50px; font-size: 1.2rem; color: var(--text-muted);">
+                    Minimalistic. Powerful. Phenomenal.
+                </p>
+            </div>
+        </div>
+        <div class="notes-area">
+            <h3>Overview</h3>
+            <ul class="bullets">
+                <li><strong>Problem:</strong> Students face chaos managing deadlines.</li>
+                <li><strong>Solution:</strong> A modern, semester-based task calendar.</li>
+                <li><strong>Tech:</strong> React + Vite + Tailwind.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SLIDE 2: TEAM MEMBERS (GRID) -->
+    <div class="slide">
+        <div class="content-area">
+            <h2>Meet the Creators</h2>
+            <div class="team-grid">
+
+                <!-- 1. Amit Kumar -->
+                <div class="team-card">
+                    <div class="avatar" style="background: linear-gradient(135deg, #6366F1, #818CF8);">AK</div>
+                    <span class="role-badge role-dev">Developer</span>
+                    <div class="member-name">Amit Kumar</div>
+                    <div class="member-desc">Core Architecture, Backend Logic & Database Design.</div>
+                </div>
+
+                <!-- 2. Amandeep -->
+                <div class="team-card">
+                    <div class="avatar" style="background: linear-gradient(135deg, #10B981, #34D399);">AD</div>
+                    <span class="role-badge role-dev">Developer</span>
+                    <div class="member-name">Amandeep</div>
+                    <div class="member-desc">Frontend Components, React Hooks & Styling.</div>
+                </div>
+
+                <!-- 3. Rohit -->
+                <div class="team-card">
+                    <div class="avatar" style="background: linear-gradient(135deg, #F59E0B, #FBBF24);">R</div>
+                    <span class="role-badge role-pm">Product Manager</span>
+                    <div class="member-name">Rohit</div>
+                    <div class="member-desc">Product Vision, Feature Roadmap & UX Research.</div>
+                </div>
+
+                <!-- 4. Rohit Yadav -->
+                <div class="team-card">
+                    <div class="avatar" style="background: linear-gradient(135deg, #EF4444, #F87171);">RY</div>
+                    <span class="role-badge role-scrum">Scrum Master</span>
+                    <div class="member-name">Rohit Yadav</div>
+                    <div class="member-desc">Agile Process, Sprint Planning & Removing Blockers.</div>
+                </div>
+
+            </div>
+        </div>
+        <div class="notes-area">
+            <h3>The Squad</h3>
+            <p>A balanced team ensuring code quality and process efficiency.</p>
+            <ul class="bullets">
+                <li><strong>Amit & Amandeep:</strong> The coding powerhouse handling Full Stack duties.</li>
+                <li><strong>Rohit (PM):</strong> Defines <em>what</em> we build (Requirements).</li>
+                <li><strong>Rohit Yadav (Scrum):</strong> Ensures <em>how</em> we build it (Speed & Efficiency).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: UI SHOWCASE - AUTH -->
+    <div class="slide">
+        <div class="content-area">
+            <h2>Authentication UI</h2>
+            <div class="browser-mockup">
+                <div class="browser-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div style="font-size:12px; color:#64748b; margin-left:10px;">localhost:5173/register</div>
+                </div>
+                <!-- SAVE YOUR IMAGE AS login.png -->
+                <img src="login.png" alt="Register Page" class="mockup-img" onerror="this.src='https://via.placeholder.com/800x450/151922/FFFFFF?text=Image+Missing:+Save+as+login.png'">
+            </div>
+        </div>
+        <div class="notes-area">
+            <h3>Login Module</h3>
+            <p>Secure and Modern Entry.</p>
+            <ul class="bullets">
+                <li>Clean Dark Mode aesthetic.</li>
+                <li>Real-time form validation.</li>
+                <li>Seamless routing to Dashboard.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: UI SHOWCASE - CALENDAR -->
+    <div class="slide">
+        <div class="content-area">
+            <h2>Task Dashboard</h2>
+            <div class="browser-mockup">
+                <div class="browser-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div style="font-size:12px; color:#64748b; margin-left:10px;">localhost:5173/dashboard</div>
+                </div>
+                <!-- SAVE YOUR IMAGE AS calendar.png -->
+                <img src="calendar.png" alt="Calendar Task Modal" class="mockup-img" onerror="this.src='https://via.placeholder.com/800x450/151922/FFFFFF?text=Image+Missing:+Save+as+calendar.png'">
+            </div>
+        </div>
+        <div class="notes-area">
+            <h3>Core Feature</h3>
+            <p>The heart of the application.</p>
+            <ul class="bullets">
+                <li><strong>Calendar:</strong> Dynamic generation of dates.</li>
+                <li><strong>Task Modal:</strong> Add tasks with specific Colors.</li>
+                <li><strong>UX:</strong> Highlighted "Today" state (Blue Circle).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: USE CASE DIAGRAM -->
+    <div class="slide">
+        <div class="content-area">
+            <h2>Functional Interactions</h2>
+            
+        </div>
+        <div class="notes-area">
+            <h3>Use Cases</h3>
+            <ul class="bullets">
+                <li><strong>Actors:</strong> Students are the primary users.</li>
+                <li><strong>Flow:</strong> From Login -> Semester Selection -> Daily Task Management.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: KANBAN BOARD -->
+    <div class="slide">
+        <div class="content-area" style="display: block;">
+            <h2>Agile Process (Week 3)</h2>
+            <div class="kanban-board">
+                <!-- DONE -->
+                <div class="kanban-col">
+                    <div class="kanban-header">
+                        <span style="color:#10B981">DONE (Weeks 1-2)</span>
+                        <span style="font-size:0.8rem; background:#10B981; padding:2px 6px; color:#000; border-radius:10px;">5</span>
+                    </div>
+                    <div class="k-card k-done">Setup React Env<br><span class="tag">Amit</span></div>
+                    <div class="k-card k-done">Auth UI Pages<br><span class="tag">Amandeep</span></div>
+                    <div class="k-card k-done">Product Requirements<br><span class="tag">Rohit (PM)</span></div>
+                    <div class="k-card k-done">Semester Modal UI<br><span class="tag">Amandeep</span></div>
+                    <div class="k-card k-done">Grid Algorithm<br><span class="tag">Amit</span></div>
+                </div>
+                <!-- IN PROGRESS -->
+                <div class="kanban-col">
+                    <div class="kanban-header">
+                        <span style="color:#3B82F6">IN PROGRESS</span>
+                        <span style="font-size:0.8rem; background:#3B82F6; padding:2px 6px; color:#fff; border-radius:10px;">3</span>
+                    </div>
+                    <div class="k-card k-high">Task Save Logic<br><span class="tag">Amit</span></div>
+                    <div class="k-card k-med">Sprint Review<br><span class="tag">Rohit Yadav</span></div>
+                    <div class="k-card k-med">Responsive Fixes<br><span class="tag">Amandeep</span></div>
+                </div>
+                <!-- TO DO -->
+                <div class="kanban-col">
+                    <div class="kanban-header">
+                        <span style="color:#94A3B8">TO DO</span>
+                    </div>
+                    <div class="k-card k-high">Drag & Drop Tasks<br><span class="tag">Feature</span></div>
+                    <div class="k-card k-low">User Profile Settings<br><span class="tag">UI</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="notes-area">
+            <h3>Status Report</h3>
+            <p>Managed by our Scrum Master.</p>
+            <ul class="bullets">
+                <li><span style="color:#10B981">✔ Done:</span> Foundation & UI.</li>
+                <li><span style="color:#3B82F6">⚡ Active:</span> Task Data integration.</li>
+                <li><strong>Velocity:</strong> On track for Week 7 delivery.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SLIDE 7: CONCLUSION -->
+    <div class="slide">
+        <div class="content-area">
+            <div style="text-align: center;">
+                <h1>Thank You!</h1>
+                <p style="font-size: 1.2rem;">Questions?</p>
+            </div>
+        </div>
+        <div class="notes-area">
+            <h3>Summary</h3>
+            <ul class="bullets">
+                <li>UniCal simplifies academic life.</li>
+                <li>Built with modern tech.</li>
+                <li>Managed via Agile.</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<div class="controls">
+    <button onclick="prevSlide()" id="prevBtn">Previous</button>
+    <button onclick="nextSlide()" id="nextBtn">Next Slide ➔</button>
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+</script>
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function showSlide(n) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        if (n >= slides.length) currentSlide = 0;
+        if (n < 0) currentSlide = slides.length - 1;
+
+        slides[currentSlide].classList.add('active');
+        const progress = ((currentSlide + 1) / slides.length) * 100;
+        progressBar.style.width = `${progress}%`;
+
+        prevBtn.disabled = currentSlide === 0;
+        nextBtn.innerText = currentSlide === slides.length - 1 ? "Finish" : "Next Slide ➔";
+    }
+
+    function nextSlide() { if(currentSlide < slides.length - 1) { currentSlide++; showSlide(currentSlide); } }
+    function prevSlide() { if(currentSlide > 0) { currentSlide--; showSlide(currentSlide); } }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === "ArrowRight") nextSlide();
+        if (e.key === "ArrowLeft") prevSlide();
+    });
+
+    showSlide(0);
+</script>
+</body>
+</html>
+```
