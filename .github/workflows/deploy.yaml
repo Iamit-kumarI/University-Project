@@ -29,7 +29,9 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            mkdir -p ~/app
             cd ~/app
+
             if [ -d "University-Project" ]; then
               cd University-Project
               git pull origin main
@@ -40,6 +42,6 @@ jobs:
 
             mvn clean package -DskipTests
 
-            pkill -f 'java -jar' || true
+            pkill -f 'university-todo' || true
 
-            nohup java -jar target/*.jar > app.log 2>&1 &
+            nohup java -jar target/university-todo-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
