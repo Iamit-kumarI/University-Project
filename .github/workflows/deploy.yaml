@@ -1,0 +1,45 @@
+name: Deploy Spring Boot to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build project
+        run: mvn clean package -DskipTests
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/app
+            if [ -d "University-Project" ]; then
+              cd University-Project
+              git pull origin main
+            else
+              git clone https://github.com/Iamit-kumarI/University-Project.git
+              cd University-Project
+            fi
+
+            mvn clean package -DskipTests
+
+            pkill -f 'java -jar' || true
+
+            nohup java -jar target/*.jar > app.log 2>&1 &
