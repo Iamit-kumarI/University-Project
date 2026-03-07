@@ -1,33 +1,25 @@
 package com.example.demo.security;
-
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
-
-    @Value("${app.jwt.secret:university_todo_super_secret_key_change_in_production_32chars}")
+    @Value("${app.jwt.secret:university_todo_super_secret_key_min_32_characters_here!}")
     private String secret;
-
-    @Value("${app.jwt.expiration:86400000}") // 24h default
+    @Value("${app.jwt.expiration:86400000}")
     private long expiration;
 
-    private Key getKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
-    }
+    private Key getKey() { return Keys.hmacShaKeyFor(secret.getBytes()); }
 
     public String generateToken(String email) {
-        return Jwts.builder()
-                .setSubject(email)
+        return Jwts.builder().setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
-                .compact();
+                .signWith(getKey(), SignatureAlgorithm.HS256).compact();
     }
 
     public String extractEmail(String token) {
@@ -36,11 +28,7 @@ public class JwtUtil {
     }
 
     public boolean isValid(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException e) {
-            return false;
-        }
+        try { Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token); return true; }
+        catch (JwtException e) { return false; }
     }
 }

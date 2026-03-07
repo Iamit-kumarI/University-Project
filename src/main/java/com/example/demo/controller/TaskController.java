@@ -1,5 +1,4 @@
 package com.example.demo.controller;
-
 import com.example.demo.dto.*;
 import com.example.demo.model.Task;
 import com.example.demo.service.TaskService;
@@ -9,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,54 +15,63 @@ import java.util.List;
 @RequestMapping("/api/semesters/{semesterId}/tasks")
 @RequiredArgsConstructor
 public class TaskController {
-
     private final TaskService taskService;
 
-    // GET /api/semesters/{semesterId}/tasks?year=2025&month=9
+    // All tasks in semester for given month
     @GetMapping
     public ResponseEntity<ApiResponse<List<Task>>> getByMonth(
-            @AuthenticationPrincipal UserDetails user,
+            @AuthenticationPrincipal UserDetails u,
             @PathVariable String semesterId,
-            @RequestParam int year,
-            @RequestParam int month) {
-        List<Task> tasks = taskService.getByMonth(user.getUsername(), semesterId, year, month);
-        return ResponseEntity.ok(ApiResponse.ok("Tasks retrieved", tasks));
+            @RequestParam int year, @RequestParam int month) {
+        return ResponseEntity.ok(ApiResponse.ok("Tasks", taskService.getByMonth(u.getUsername(), semesterId, year, month)));
     }
 
-    // GET /api/semesters/{semesterId}/tasks/date?date=2025-09-03
+    // All tasks in semester (no date filter) — for list view
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<Task>>> getAll(
+            @AuthenticationPrincipal UserDetails u,
+            @PathVariable String semesterId) {
+        return ResponseEntity.ok(ApiResponse.ok("All tasks", taskService.getAllForSemester(u.getUsername(), semesterId)));
+    }
+
     @GetMapping("/date")
     public ResponseEntity<ApiResponse<List<Task>>> getByDate(
-            @AuthenticationPrincipal UserDetails user,
+            @AuthenticationPrincipal UserDetails u,
             @PathVariable String semesterId,
             @RequestParam LocalDate date) {
-        List<Task> tasks = taskService.getByDate(user.getUsername(), semesterId, date);
-        return ResponseEntity.ok(ApiResponse.ok("Tasks for date", tasks));
+        return ResponseEntity.ok(ApiResponse.ok("Tasks for date", taskService.getByDate(u.getUsername(), semesterId, date)));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<Task>> create(
-            @AuthenticationPrincipal UserDetails user,
+            @AuthenticationPrincipal UserDetails u,
             @PathVariable String semesterId,
             @Valid @RequestBody TaskRequest req) {
-        return ResponseEntity.ok(ApiResponse.ok("Task created",
-                taskService.create(user.getUsername(), semesterId, req)));
+        return ResponseEntity.ok(ApiResponse.ok("Task created", taskService.create(u.getUsername(), semesterId, req)));
     }
 
     @PutMapping("/{taskId}")
     public ResponseEntity<ApiResponse<Task>> update(
-            @AuthenticationPrincipal UserDetails user,
+            @AuthenticationPrincipal UserDetails u,
             @PathVariable String semesterId,
             @PathVariable String taskId,
             @Valid @RequestBody TaskRequest req) {
-        return ResponseEntity.ok(ApiResponse.ok("Task updated",
-                taskService.update(user.getUsername(), taskId, req)));
+        return ResponseEntity.ok(ApiResponse.ok("Task updated", taskService.update(u.getUsername(), taskId, req)));
+    }
+
+    // PATCH toggle complete — no full body needed
+    @PatchMapping("/{taskId}/toggle")
+    public ResponseEntity<ApiResponse<Task>> toggle(
+            @AuthenticationPrincipal UserDetails u,
+            @PathVariable String taskId) {
+        return ResponseEntity.ok(ApiResponse.ok("Task toggled", taskService.toggleComplete(u.getUsername(), taskId)));
     }
 
     @DeleteMapping("/{taskId}")
     public ResponseEntity<ApiResponse<Void>> delete(
-            @AuthenticationPrincipal UserDetails user,
+            @AuthenticationPrincipal UserDetails u,
             @PathVariable String taskId) {
-        taskService.delete(user.getUsername(), taskId);
+        taskService.delete(u.getUsername(), taskId);
         return ResponseEntity.ok(ApiResponse.ok("Task deleted", null));
     }
 }

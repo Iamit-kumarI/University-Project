@@ -1,12 +1,9 @@
 package com.example.demo.config;
-
 import com.example.demo.dto.ApiResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -14,8 +11,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ApiResponse<Void>> handleStatus(ResponseStatusException ex) {
-        return ResponseEntity.status(ex.getStatusCode())
-                .body(ApiResponse.fail(ex.getReason()));
+        return ResponseEntity.status(ex.getStatusCode()).body(ApiResponse.fail(ex.getReason()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

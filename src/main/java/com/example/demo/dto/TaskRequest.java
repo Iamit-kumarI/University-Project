@@ -1,7 +1,6 @@
 package com.example.demo.dto;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.example.demo.model.SubTask;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.time.LocalDate;
 import java.util.List;
@@ -12,6 +11,10 @@ public class TaskRequest {
     private String description;
     @NotNull private LocalDate date;
     private String color;
-    private List<String> checklist;
     private boolean completed;
+    private String priority;           // LOW / MEDIUM / HIGH / URGENT
+    private List<String> tags;
+    private List<SubTask> checklist;   // now with done state
+    private String dueTime;
+    private String subject;
 }
