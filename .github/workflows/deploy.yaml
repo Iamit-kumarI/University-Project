@@ -1,4 +1,4 @@
-name: Deploy Spring Boot to EC2
+name: Deploy Spring Boot App
 
 on:
   push:
@@ -10,25 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Java
-        uses: actions/setup-java@v3
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Build project
-        run: mvn clean package -DskipTests
-
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: false
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             mkdir -p ~/app
             cd ~/app
