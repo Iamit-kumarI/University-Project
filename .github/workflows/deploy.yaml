@@ -1,4 +1,4 @@
-name: Deploy Spring Boot App
+name: Deploy Spring Boot App v2
 
 on:
   push:
